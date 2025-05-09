@@ -48,88 +48,105 @@ goto menu
 :build_pe
 echo Generating full PE structure with Kernel32 import...
 (
-    echo BITS 32
-    echo org 0x400000
+    echo [BITS 32]
+    echo [ORG 0x400000]
     
-    echo SECTION .text
+    echo section .text
     echo start:
-    echo     call delta
-    echo delta:
-    echo     pop ebp
-    echo     sub ebp, delta
     
     echo     ; Your code here
     type "%input%"
     
-    echo     ; ExitProcess call
+    echo     ; ExitProcess
     echo     push 0
-    echo     mov eax, [ebp+ExitProcess]
-    echo     call eax
+    echo     call [ExitProcess]
     
-    echo ; PE headers
+    echo ; ===== PE HEADERS =====
+    echo align 4, db 0
+    
     echo IMAGE_DOS_HEADER:
-    echo     db 'MZ',0,0
+    echo     db 'MZ', 90, 0
     echo     times 60 - ($-IMAGE_DOS_HEADER) db 0
     echo     dd IMAGE_NT_HEADERS
     
     echo IMAGE_NT_HEADERS:
     echo     db 'PE',0,0
     echo IMAGE_FILE_HEADER:
-    echo     dw 0x014C
-    echo     dw 1
-    echo     dd 0
-    echo     dd 0
-    echo     dd 0
-    echo     dw 0xE0
-    echo     dw 0x010F
+    echo     dw 0x014C      ; Machine (x86)
+    echo     dw 1           ; NumberOfSections
+    echo     dd 0           ; TimeDateStamp
+    echo     dd 0           ; PointerToSymbolTable
+    echo     dd 0           ; NumberOfSymbols
+    echo     dw 0xE0        ; SizeOfOptionalHeader
+    echo     dw 0x103       ; Characteristics
     
     echo IMAGE_OPTIONAL_HEADER32:
-    echo     dd 0x10B
-    echo     dd 0x1000
-    echo     dd 0x1000
-    echo     dd 0x1000
-    echo     dd 0x2000
-    echo     dd 0x400000
-    echo     dd 0x1000
-    echo     dd 0x200
-    echo     dw 3
-    echo     dw 0
-    echo     dd 0
-    echo     dd 0x10000
-    echo     dd 0x1000
-    echo     dd 0
-    echo     dw 0
-    echo     dw 0
-    echo     dd 0x00000000
+    echo     dw 0x10B       ; Magic (PE32)
+    echo     db 0,0         ; MajorLinkerVersion
+    echo     db 0,0         ; MinorLinkerVersion
+    echo     dd 0x1000      ; SizeOfCode
+    echo     dd 0           ; SizeOfInitializedData
+    echo     dd 0           ; SizeOfUninitializedData
+    echo     dd 0x1000      ; AddressOfEntryPoint
+    echo     dd 0x1000      ; BaseOfCode
+    echo     dd 0           ; BaseOfData
+    echo     dd 0x400000    ; ImageBase
+    echo     dd 0x1000      ; SectionAlignment
+    echo     dd 0x200       ; FileAlignment
+    echo     dw 4           ; MajorOSVersion
+    echo     dw 0           ; MinorOSVersion
+    echo     dw 0           ; MajorImageVersion
+    echo     dw 0           ; MinorImageVersion
+    echo     dw 4           ; MajorSubsystemVersion
+    echo     dw 0           ; MinorSubsystemVersion
+    echo     dd 0           ; Win32VersionValue
+    echo     dd 0x2000      ; SizeOfImage
+    echo     dd 0x200       ; SizeOfHeaders
+    echo     dd 0           ; CheckSum
+    echo     dw 2           ; Subsystem (Windows GUI)
+    echo     dw 0x400       ; DllCharacteristics
+    echo     dd 0x100000    ; SizeOfStackReserve
+    echo     dd 0x1000      ; SizeOfStackCommit
+    echo     dd 0x100000    ; SizeOfHeapReserve
+    echo     dd 0x1000      ; SizeOfHeapCommit
+    echo     dd 0           ; LoaderFlags
+    echo     dd 16          ; NumberOfRvaAndSizes
+    
+    echo ; Data directories
+    echo     dd 0,0         ; Export
+    echo     dd IMAGE_IMPORT_DESCRIPTOR, 0 ; Import
+    echo     times 14 dd 0,0
     
     echo IMAGE_SECTION_HEADER:
     echo     db '.text',0,0,0
-    echo     dd 0x1000
-    echo     dd 0x1000
-    echo     dd _text_size
-    echo     dd _text_start
-    echo     dd 0
-    echo     dd 0
-    echo     dw 0
-    echo     dw 0
-    echo     dd 0x60000020
+    echo     dd 0x1000      ; VirtualSize
+    echo     dd 0x1000      ; VirtualAddress
+    echo     dd _text_size  ; SizeOfRawData
+    echo     dd 0x200       ; PointerToRawData
+    echo     dd 0           ; PointerToRelocations
+    echo     dd 0           ; PointerToLinenumbers
+    echo     dw 0           ; NumberOfRelocations
+    echo     dw 0           ; NumberOfLinenumbers
+    echo     dd 0x60000020  ; Characteristics
     
-    echo ; Import table
+    echo ; ===== IMPORT TABLE =====
     echo IMAGE_IMPORT_DESCRIPTOR:
-    echo     dd kernel32_iat
-    echo     dd 0
-    echo     dd 0
-    echo     dd kernel32_dll
-    echo     dd kernel32_iat
+    echo     dd kernel32_iat - IMAGE_DOS_HEADER ; OriginalFirstThunk
+    echo     dd 0           ; TimeDateStamp
+    echo     dd 0           ; ForwarderChain
+    echo     dd kernel32_dll - IMAGE_DOS_HEADER ; Name
+    echo     dd kernel32_iat - IMAGE_DOS_HEADER ; FirstThunk
     
-    echo kernel32_dll db 'KERNEL32.dll',0
+    echo     dd 0,0,0,0,0   ; Terminator
+    
+    echo kernel32_dll db 'kernel32.dll',0
     echo kernel32_iat:
-    echo ExitProcess dd _ExitProcess
-    echo              dd 0
+    echo     dd ExitProcess - IMAGE_DOS_HEADER
+    echo     dd 0
     
-    echo _ExitProcess db 0,0,'ExitProcess',0
+    echo ExitProcess db 0,0, 'ExitProcess',0
     
-    echo _text_start:
+    echo _text_size equ $ - IMAGE_DOS_HEADER
 ) > temp.asm
 
 set "input=temp.asm"
@@ -148,7 +165,7 @@ if exist "temp.asm" del "temp.asm"
 
 if exist "%output%" (
     echo Success: %output%
-    echo Note: Works for simple programs only
+    echo Note: Run with administrative rights if needed
 ) else (
     echo Output file not created
 )
