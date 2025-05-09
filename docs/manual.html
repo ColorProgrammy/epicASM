@@ -8,18 +8,22 @@
     <h1>ASM Compiler/Disassembler Tool</h1>
     
     <h2>Description</h2>
-    <p>This batch script compiles ASM files to either flat binary (.bin) or Windows PE executable (.exe) format.</p>
+    <p>This tool provides two functions:</p>
+    <ol>
+        <li>Compile ASM files to binary or PE executables</li>
+        <li>Disassemble executables back to ASM code</li>
+    </ol>
     
     <h2>Requirements</h2>
     <ul>
         <li>Windows OS</li>
-        <li>NASM assembler (must be in ./nasm/nasm.exe)</li>
+        <li>NASM assembler (./nasm/nasm.exe)</li>
+        <li>NDISASM (./nasm/ndisasm.exe)</li>
+        <li>MinGW objdump (./mingw/objdump.exe)</li>
     </ul>
     
-    <h2>Basic Usage</h2>
+    <h2>Compiler Usage</h2>
     <pre>compile.bat input.asm</pre>
-    
-    <h3>Operation Steps:</h3>
     <ol>
         <li>Select output format:
             <ul>
@@ -27,60 +31,53 @@
                 <li><b>2</b> - Windows EXE (.exe)</li>
             </ul>
         </li>
-        <li>The script checks for existing PE headers</li>
-        <li>Generates temporary file with PE structure if needed</li>
-        <li>Compiles using NASM</li>
     </ol>
+    
+    <h2>Disassembler Usage</h2>
+    <pre>disasm.bat input.[exe|dll|bin]</pre>
+    <p>Supported input formats:</p>
+    <ul>
+        <li>.exe - PE executables</li>
+        <li>.dll - DLL files</li>
+        <li>.bin - Raw binary files</li>
+    </ul>
+    
+    <h3>Disassembler Behavior</h3>
+    <ul>
+        <li>For .bin files: Uses ndisasm (32-bit mode)</li>
+        <li>For PE files: Uses objdump</li>
+        <li>Output: Creates inputname.asm file</li>
+    </ul>
     
     <h2>Examples</h2>
-    <h3>1. Compile to binary:</h3>
+    <h3>Compilation:</h3>
     <pre>compile.bat program.asm
-[Select option 1]</pre>
+[Select option 2 for EXE]</pre>
     
-    <h3>2. Compile to EXE (auto headers):</h3>
-    <pre>compile.bat program.asm
-[Select option 2]</pre>
-    
-    <h3>3. Compile to EXE (custom headers):</h3>
-    <p>If your file already contains proper PE headers (MZ/PE signatures), they will be used as-is.</p>
-    
-    <h2>Customization</h2>
-    <p>To add additional imported functions:</p>
-    <ol>
-        <li>Edit compile.bat</li>
-        <li>Find the <code>:build_pe</code> section</li>
-        <li>Add new functions following the existing pattern</li>
-    </ol>
+    <h3>Disassembly:</h3>
+    <pre>disasm.bat program.exe
+[Creates program.asm]</pre>
     
     <h2>Troubleshooting</h2>
-    <h3>"NASM not found" error</h3>
-    <p>Ensure:</p>
+    <h3>Common Errors:</h3>
     <ul>
-        <li>NASM is installed in ./nasm/</li>
-        <li>The executable is named nasm.exe</li>
-    </ul>
-    
-    <h3>"Output file not created"</h3>
-    <p>Possible causes:</p>
-    <ul>
-        <li>Syntax errors in ASM code</li>
-        <li>Insufficient write permissions</li>
-        <li>Antivirus blocking EXE creation</li>
-    </ul>
-    
-    <h3>EXE won't run</h3>
-    <p>Try:</p>
-    <ul>
-        <li>Running as administrator</li>
-        <li>Checking 32-bit compatibility</li>
-        <li>Verifying all required functions are imported</li>
+        <li><b>Missing tools</b> - Ensure all executables are in their correct folders</li>
+        <li><b>File not found</b> - Check file paths and extensions</li>
+        <li><b>Disassembly fails</b> - Verify file isn't corrupted or protected</li>
     </ul>
     
     <h2>Limitations</h2>
     <ul>
-        <li>32-bit architecture only (x86)</li>
-        <li>Only .asm, .bin and dll files supported</li>
-        <li>Basic PE header generation</li>
+        <li>32-bit architecture only</li>
+        <li>Basic PE file support</li>
+        <li>Output may need manual cleanup</li>
     </ul>
+    
+    <h2>Tool Locations</h2>
+    <pre>
+./nasm/nasm.exe      - Assembler
+./nasm/ndisasm.exe   - Binary disassembler 
+./mingw/objdump.exe  - PE disassembler
+    </pre>
 </body>
 </html>
