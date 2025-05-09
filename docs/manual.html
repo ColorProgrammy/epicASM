@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>ASM Compiler/Disassembler Manual</title>
+</head>
+<body>
+    <h1>ASM Compiler/Disassembler Tool</h1>
+    
+    <h2>Description</h2>
+    <p>This batch script compiles ASM files to either flat binary (.bin) or Windows PE executable (.exe) format.</p>
+    
+    <h2>Requirements</h2>
+    <ul>
+        <li>Windows OS</li>
+        <li>NASM assembler (must be in ./nasm/nasm.exe)</li>
+    </ul>
+    
+    <h2>Basic Usage</h2>
+    <pre>compile.bat input.asm</pre>
+    
+    <h3>Operation Steps:</h3>
+    <ol>
+        <li>Select output format:
+            <ul>
+                <li><b>1</b> - Flat binary (.bin)</li>
+                <li><b>2</b> - Windows EXE (.exe)</li>
+            </ul>
+        </li>
+        <li>The script checks for existing PE headers</li>
+        <li>Generates temporary file with PE structure if needed</li>
+        <li>Compiles using NASM</li>
+    </ol>
+    
+    <h2>Examples</h2>
+    <h3>1. Compile to binary:</h3>
+    <pre>compile.bat program.asm
+[Select option 1]</pre>
+    
+    <h3>2. Compile to EXE (auto headers):</h3>
+    <pre>compile.bat program.asm
+[Select option 2]</pre>
+    
+    <h3>3. Compile to EXE (custom headers):</h3>
+    <p>If your file already contains proper PE headers (MZ/PE signatures), they will be used as-is.</p>
+    
+    <h2>Customization</h2>
+    <p>To add additional imported functions:</p>
+    <ol>
+        <li>Edit compile.bat</li>
+        <li>Find the <code>:build_pe</code> section</li>
+        <li>Add new functions following the existing pattern</li>
+    </ol>
+    
+    <h2>Troubleshooting</h2>
+    <h3>"NASM not found" error</h3>
+    <p>Ensure:</p>
+    <ul>
+        <li>NASM is installed in ./nasm/</li>
+        <li>The executable is named nasm.exe</li>
+    </ul>
+    
+    <h3>"Output file not created"</h3>
+    <p>Possible causes:</p>
+    <ul>
+        <li>Syntax errors in ASM code</li>
+        <li>Insufficient write permissions</li>
+        <li>Antivirus blocking EXE creation</li>
+    </ul>
+    
+    <h3>EXE won't run</h3>
+    <p>Try:</p>
+    <ul>
+        <li>Running as administrator</li>
+        <li>Checking 32-bit compatibility</li>
+        <li>Verifying all required functions are imported</li>
+    </ul>
+    
+    <h2>Limitations</h2>
+    <ul>
+        <li>32-bit architecture only (x86)</li>
+        <li>Only .asm, .bin and dll files supported</li>
+        <li>Basic PE header generation</li>
+    </ul>
+</body>
+</html>
