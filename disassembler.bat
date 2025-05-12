@@ -4,6 +4,8 @@ setlocal enabledelayedexpansion
 
 echo epicASM v1.0
 echo Copyright (c) ColorProgrammy 2025
+echo
+echo Disassemble BIN/EXE to assembler
 
 
 if "%~1"=="" (
