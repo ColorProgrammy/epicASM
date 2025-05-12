@@ -1,20 +1,23 @@
 @echo off
 setlocal enabledelayedexpansion
 
-:: Проверка наличия файла
+echo epicASM v1.0
+echo Copyright (c) ColorProgrammy 2025
+echo
+echo Build assembly code in exe/bin
+
 if "%~1"=="" (
-    echo Error: Drag ASM file onto script
+    echo Error: Drag ASM file onto batch
     goto error
 )
 
 set "input=%~1"
 set "name=%~n1"
 
-:: Пути к инструментам
+:: Paths to tools
 set "NASM=nasm\nasm.exe"
 set "GOLINK=golink\GoLink.exe"
 
-:: Проверка инструментов
 if not exist "%NASM%" (
     echo Error: NASM not found in .\nasm\
     goto error
@@ -26,7 +29,6 @@ echo 1) Flat binary (.bin)
 echo 2) Windows EXE (.exe)
 set /p choice="Your choice [1-2]: "
 
-:: Генерация уникальных имен
 set "counter=0"
 :name_loop
 set "suffix="
@@ -39,7 +41,7 @@ if exist "!output_bin!" (
     goto name_loop
 )
 
-:: Компиляция BIN
+:: BIN
 if "%choice%"=="1" (
     echo Compiling BIN...
     "%NASM%" -f bin "%input%" -o "!output_bin!" || (
@@ -50,7 +52,7 @@ if "%choice%"=="1" (
     goto success
 )
 
-:: Компиляция EXE
+:: EXE
 if "%choice%"=="2" (
     echo Compiling OBJ...
     "%NASM%" -f win32 "%input%" -o "!output_obj!" || (
