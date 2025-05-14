@@ -5,6 +5,8 @@ echo epicASM v1.0
 echo Copyright (c) ColorProgrammy 2025
 echo
 echo Build assembly code in exe/bin
+echo ---
+echo
 
 if "%~1"=="" (
     echo Error: Drag ASM file onto batch
