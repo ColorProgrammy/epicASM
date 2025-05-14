@@ -6,10 +6,11 @@ echo epicASM v1.0
 echo Copyright (c) ColorProgrammy 2025
 echo
 echo Disassemble BIN/EXE to assembler
-
+echo ---
+echo
 
 if "%~1"=="" (
-    echo Error: Drag ASM file onto batch.
+    echo Error: Drag exe/bin file onto batch.
     goto error
 )
 
