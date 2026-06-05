@@ -1,4 +1,4 @@
-epicASM v1.0
+epicASM v1.00
         simple compiler and disassembler
 By ColorProgrammy
 
